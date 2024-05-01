@@ -18,6 +18,8 @@ data class IntroScreenState(val state: State = State.START) : ScreenState {
     val backgroundColor: String = "#FFE9FE"
     val imageName: String = "kido"
     val headline: String = "Personalized parent program that adapts to your kid."
+    val headlineBolt: String = "your kid."
     val startForFree: String = "Start for free"
     val alreadyHaveAnAccount: String = "Already have an account? Log in"
+    val alreadyHaveAnAccountBolt: String = "Log in"
 }
