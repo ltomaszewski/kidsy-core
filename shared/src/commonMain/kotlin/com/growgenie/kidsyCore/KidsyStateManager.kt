@@ -53,6 +53,15 @@ class KidsyStateManager {
                     throw IllegalArgumentException("Unknown option selected")
                 }
             }
+            OnboardingScreenState.ActionType.TEXT_INPUT -> {
+                println("TEXT_INPUT value...")
+                val nextScreenState = screenState.nextScreen()
+                if (nextScreenState.state != OnboardingScreenState.State.DONE) {
+                    _screenState.value = nextScreenState
+                } else {
+                    _screenState.value = ProcessingScreenState()
+                }
+            }
         }
     }
 

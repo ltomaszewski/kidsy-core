@@ -17,15 +17,10 @@ data class OnboardingScreenState(val jsonInput: String = JSON_INPUT,
     enum class State { ONBOARDING, DONE }
 
     enum class ActionType {
-        SUBMIT, SELECT
+        SUBMIT, SELECT, TEXT_INPUT
     }
 
-    class Action(val type: ActionType, val option: Int? = null) : UserAction {
-        companion object {
-            fun create(type: ActionType, option: Int? = null): Action {
-                return Action(type, option)
-            }
-        }
+    class Action(val type: ActionType, val option: Int? = null, val text: String? = null) : UserAction {
     }
 
     val onboarding: OnboardingModel
