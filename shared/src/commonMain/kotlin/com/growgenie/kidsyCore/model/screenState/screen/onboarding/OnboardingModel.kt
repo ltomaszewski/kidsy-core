@@ -22,7 +22,8 @@ data class OnboardingScreenModel(
 @Serializable
 data class OnboardingOption(
     val id: Int,
-    val text: String
+    val text: String,
+    val imageName: String? = null
 )
 
 @Serializable
