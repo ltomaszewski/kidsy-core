@@ -1,8 +1,6 @@
 package com.growgenie.kidsyCore
 
-import com.growgenie.kidsyCore.model.screenState.screen.CreateAnAccountScreenState
 import com.growgenie.kidsyCore.model.screenState.screen.IntroScreenState
-import com.growgenie.kidsyCore.model.screenState.screen.ProcessingScreenState
 import com.growgenie.kidsyCore.model.screenState.screen.onboarding.OnboardingScreenState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

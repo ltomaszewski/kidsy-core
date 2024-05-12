@@ -16,7 +16,7 @@ class KidsyStateManager {
         when (screenState.value) {
             is IntroScreenState -> handleIntroAction(screenState.value, action as IntroScreenState.Action)
             is OnboardingScreenState -> handleOnboardingAction(screenState.value, action as OnboardingScreenState.Action)
-            is ProcessingScreenState -> handleProcessingAction(screenState.value, action as ProcessingScreenState.Action)
+            is OnboardingProcessingScreenState -> handleProcessingAction(screenState.value, action as OnboardingProcessingScreenState.Action)
             is CreateAnAccountScreenState -> handleCreateAccountAction(screenState.value, action as CreateAnAccountScreenState.Action)
             else -> throw IllegalArgumentException("Unknown screen type")
         }
@@ -42,7 +42,7 @@ class KidsyStateManager {
                 if (nextScreenState.state != OnboardingScreenState.State.DONE) {
                     _screenState.value = nextScreenState
                 } else {
-                    _screenState.value = ProcessingScreenState()
+                    _screenState.value = OnboardingSuccessState()
                 }
             }
             OnboardingScreenState.ActionType.SELECT -> {
@@ -59,23 +59,23 @@ class KidsyStateManager {
                 if (nextScreenState.state != OnboardingScreenState.State.DONE) {
                     _screenState.value = nextScreenState
                 } else {
-                    _screenState.value = ProcessingScreenState()
+                    _screenState.value = OnboardingSuccessState()
                 }
             }
         }
     }
 
-    private fun handleProcessingAction(screenState: ProcessingScreenState, action: ProcessingScreenState.Action) {
+    private fun handleProcessingAction(screenState: OnboardingProcessingScreenState, action: OnboardingProcessingScreenState.Action) {
         when (action) {
-            ProcessingScreenState.Action.CREATE_AN_ACCOUNT -> {
+            OnboardingProcessingScreenState.Action.CREATE_AN_ACCOUNT -> {
                 println("Creating an account...")
                 _screenState.value = CreateAnAccountScreenState()
             }
-            ProcessingScreenState.Action.MOVE_TO_NEXT_STEP -> {
+            OnboardingProcessingScreenState.Action.MOVE_TO_NEXT_STEP -> {
                 println("Move to next step...")
                 _screenState.value = screenState.nextScreen()
             }
-            ProcessingScreenState.Action.LOGIN_IN -> {
+            OnboardingProcessingScreenState.Action.LOGIN_IN -> {
                 println("Logging in from processing screen...")
             }
         }

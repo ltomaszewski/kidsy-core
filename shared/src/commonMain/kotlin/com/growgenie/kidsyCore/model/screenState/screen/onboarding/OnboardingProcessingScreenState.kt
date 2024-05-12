@@ -1,11 +1,11 @@
-package com.growgenie.kidsyCore.model.screenState.screen
+package com.growgenie.kidsyCore.model.screenState.screen.onboarding
 
 import com.growgenie.kidsyCore.model.screenState.ScreenName
 import com.growgenie.kidsyCore.model.screenState.ScreenState
 import com.growgenie.kidsyCore.model.screenState.UserAction
 
-data class ProcessingScreenState(val state: State = State.TEXT1): ScreenState {
-    override val screenName: ScreenName = ScreenName.PROCESSING
+data class OnboardingProcessingScreenState(val state: State = State.TEXT1): ScreenState {
+    override val screenName: ScreenName = ScreenName.ONBOARDING_PROCESSING
 
     enum class State { TEXT1, TEXT2, TEXT3, DONE }
 
@@ -28,7 +28,7 @@ data class ProcessingScreenState(val state: State = State.TEXT1): ScreenState {
             }
         }
 
-    fun nextScreen(): ProcessingScreenState {
+    fun nextScreen(): OnboardingProcessingScreenState {
         return when(state) {
             State.TEXT1 -> copy(state = State.TEXT2)
             State.TEXT2 -> copy(state = State.TEXT3)
