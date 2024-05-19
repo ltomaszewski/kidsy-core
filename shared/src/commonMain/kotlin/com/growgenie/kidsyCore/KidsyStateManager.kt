@@ -17,6 +17,7 @@ class KidsyStateManager {
             is IntroScreenState -> handleIntroAction(screenState.value, action as IntroScreenState.Action)
             is OnboardingScreenState -> handleOnboardingAction(screenState.value, action as OnboardingScreenState.Action)
             is OnboardingProcessingScreenState -> handleProcessingAction(screenState.value, action as OnboardingProcessingScreenState.Action)
+            is OnboardingSuccessState -> handleOnboardingSuccessStateAction(screenState.value, action as OnboardingSuccessState.Action)
             is CreateAnAccountScreenState -> handleCreateAccountAction(screenState.value, action as CreateAnAccountScreenState.Action)
             else -> throw IllegalArgumentException("Unknown screen type")
         }
@@ -81,13 +82,21 @@ class KidsyStateManager {
         }
     }
 
-    private fun handleCreateAccountAction(screenState: CreateAnAccountScreenState, action: CreateAnAccountScreenState.Action) {
+    private fun handleOnboardingSuccessStateAction(screenState: OnboardingSuccessState, action: OnboardingSuccessState.Action) {
         when (action) {
-            CreateAnAccountScreenState.Action.SOCIAL_LOGIN -> {
-                println("Social login...")
+            OnboardingSuccessState.Action.CREATE_ACCOUNT -> {
+                _screenState.value = CreateAnAccountScreenState()
             }
-            CreateAnAccountScreenState.Action.EMAIL -> {
-                println("Email login/sign-up...")
+            OnboardingSuccessState.Action.LOG_IN -> {
+                println("LOG IN...")
+            }
+        }
+    }
+
+    private fun handleCreateAccountAction(screenState: CreateAnAccountScreenState, action: CreateAnAccountScreenState.Action) {
+        when (action.type) {
+            CreateAnAccountScreenState.ActionType.LoggedIn -> {
+                println("Social LoggedIn with " + action.socialMedia + " userIdentifier " + action.userIdentifier + " fullName " + action.fullName + " email " + action.email)
             }
         }
     }

@@ -3,6 +3,7 @@ package com.growgenie.kidsyCore.model.screenState.screen
 import com.growgenie.kidsyCore.model.screenState.ScreenName
 import com.growgenie.kidsyCore.model.screenState.ScreenState
 import com.growgenie.kidsyCore.model.screenState.UserAction
+import com.growgenie.kidsyCore.model.screenState.screen.onboarding.OnboardingScreenState
 
 data class CreateAnAccountScreenState(val state: State = State.START): ScreenState {
     override val screenName: ScreenName = ScreenName.CREATE_AN_ACCOUNT
@@ -11,8 +12,15 @@ data class CreateAnAccountScreenState(val state: State = State.START): ScreenSta
         START, CREATING_VIA_SOCIAL, DONE
     }
 
-    enum class Action: UserAction {
-        SOCIAL_LOGIN, EMAIL
+    enum class ActionType {
+        LoggedIn
+    }
+
+    class Action(val type: ActionType,
+                 val socialMedia: SocialLoginAction,
+                 val userIdentifier: String? = null,
+                 val fullName: String? = null,
+                 val email: String? = null) : UserAction {
     }
 
     enum class SocialLoginAction {
