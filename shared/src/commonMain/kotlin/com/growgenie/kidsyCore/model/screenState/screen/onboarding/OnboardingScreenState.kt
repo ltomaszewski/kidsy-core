@@ -1,17 +1,17 @@
 package com.growgenie.kidsyCore.model.screenState.screen.onboarding
 
 import OnboardingModel
-import OnboardingOption
-import OnboardingScreenModel
 import com.growgenie.kidsyCore.model.screenState.ScreenName
 import com.growgenie.kidsyCore.model.screenState.ScreenState
 import com.growgenie.kidsyCore.model.screenState.UserAction
+import com.growgenie.kidsyCore.model.screenState.screen.Option
+import com.growgenie.kidsyCore.model.screenState.screen.ScreenModel
 import kotlinx.serialization.json.Json
 
 data class OnboardingScreenState(val jsonInput: String = JSON_INPUT,
                                  val state: State = State.ONBOARDING,
                                  val index: Int = 0,
-                                 val selectedOptions: List<OnboardingOption> = listOf()) : ScreenState {
+                                 val selectedOptions: List<Option> = listOf()) : ScreenState {
     override val screenName: ScreenName = ScreenName.ONBOARDING
 
     enum class State { ONBOARDING, DONE }
@@ -20,11 +20,10 @@ data class OnboardingScreenState(val jsonInput: String = JSON_INPUT,
         SUBMIT, SELECT, TEXT_INPUT
     }
 
-    class Action(val type: ActionType, val option: Int? = null, val text: String? = null) : UserAction {
-    }
+    class Action(val type: ActionType, val option: Int? = null, val text: String? = null) : UserAction
 
     val onboarding: OnboardingModel
-    val currentScreenModel: OnboardingScreenModel
+    val currentScreenModel: ScreenModel
     val size : Int
 
     init {

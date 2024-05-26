@@ -4,7 +4,7 @@ import com.growgenie.kidsyCore.model.screenState.ScreenName
 import com.growgenie.kidsyCore.model.screenState.ScreenState
 import com.growgenie.kidsyCore.model.screenState.UserAction
 
-data class OnboardingSuccessState(val state: State = State.NORMAL): ScreenState {
+data class OnboardingSuccessScreenState(val state: State = State.NORMAL): ScreenState {
     override val screenName: ScreenName = ScreenName.ONBOARDING_SUCCESS
     enum class State {
         NORMAL

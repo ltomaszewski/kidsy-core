@@ -4,21 +4,32 @@ import com.growgenie.kidsyCore.model.screenState.ScreenState
 import com.growgenie.kidsyCore.model.screenState.UserAction
 import com.growgenie.kidsyCore.model.screenState.screen.*
 import com.growgenie.kidsyCore.model.screenState.screen.onboarding.*
+import com.growgenie.kidsyCore.model.screenState.screen.plan.PlanModel
+import com.growgenie.kidsyCore.model.screenState.screen.plan.PlanScreenState
+import com.growgenie.kidsyCore.model.screenState.screen.plan.Plans
+import com.growgenie.kidsyCore.stateHandler.LetsBeginWithPlanStateHandler
+import com.growgenie.kidsyCore.stateHandler.PlanScreenStateStateHandler
 import com.growgenie.kidsyCore.utils.wrap
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.serialization.json.Json
 
 class KidsyStateManager {
     private val _screenState = MutableStateFlow<ScreenState>(IntroScreenState())
     val screenState = _screenState.asStateFlow().wrap()
+
+    private val letsBeginStateHandler = LetsBeginWithPlanStateHandler()
+    private val planStateHandler = PlanScreenStateStateHandler()
 
     fun executeAction(action: UserAction) {
         when (screenState.value) {
             is IntroScreenState -> handleIntroAction(screenState.value, action as IntroScreenState.Action)
             is OnboardingScreenState -> handleOnboardingAction(screenState.value, action as OnboardingScreenState.Action)
             is OnboardingProcessingScreenState -> handleProcessingAction(screenState.value, action as OnboardingProcessingScreenState.Action)
-            is OnboardingSuccessState -> handleOnboardingSuccessStateAction(screenState.value, action as OnboardingSuccessState.Action)
+            is OnboardingSuccessScreenState -> handleOnboardingSuccessStateAction(screenState.value, action as OnboardingSuccessScreenState.Action)
             is CreateAnAccountScreenState -> handleCreateAccountAction(screenState.value, action as CreateAnAccountScreenState.Action)
+            is LetsBeginWithPlanScreenState -> _screenState.value = letsBeginStateHandler.handle(screenState.value, action as LetsBeginWithPlanScreenState.Action)
+            is PlanScreenState -> _screenState.value = planStateHandler.handle(screenState.value, action as PlanScreenState.Action)
             else -> throw IllegalArgumentException("Unknown screen type")
         }
     }
@@ -43,7 +54,7 @@ class KidsyStateManager {
                 if (nextScreenState.state != OnboardingScreenState.State.DONE) {
                     _screenState.value = nextScreenState
                 } else {
-                    _screenState.value = OnboardingSuccessState()
+                    _screenState.value = OnboardingSuccessScreenState()
                 }
             }
             OnboardingScreenState.ActionType.SELECT -> {
@@ -60,7 +71,7 @@ class KidsyStateManager {
                 if (nextScreenState.state != OnboardingScreenState.State.DONE) {
                     _screenState.value = nextScreenState
                 } else {
-                    _screenState.value = OnboardingSuccessState()
+                    _screenState.value = OnboardingSuccessScreenState()
                 }
             }
         }
@@ -82,12 +93,12 @@ class KidsyStateManager {
         }
     }
 
-    private fun handleOnboardingSuccessStateAction(screenState: OnboardingSuccessState, action: OnboardingSuccessState.Action) {
+    private fun handleOnboardingSuccessStateAction(screenState: OnboardingSuccessScreenState, action: OnboardingSuccessScreenState.Action) {
         when (action) {
-            OnboardingSuccessState.Action.CREATE_ACCOUNT -> {
+            OnboardingSuccessScreenState.Action.CREATE_ACCOUNT -> {
                 _screenState.value = CreateAnAccountScreenState()
             }
-            OnboardingSuccessState.Action.LOG_IN -> {
+            OnboardingSuccessScreenState.Action.LOG_IN -> {
                 println("LOG IN...")
             }
         }
@@ -97,6 +108,9 @@ class KidsyStateManager {
         when (action.type) {
             CreateAnAccountScreenState.ActionType.LoggedIn -> {
                 println("Social LoggedIn with " + action.socialMedia + " userIdentifier " + action.userIdentifier + " fullName " + action.fullName + " email " + action.email)
+                val json = Json { ignoreUnknownKeys = true } // Configure the Json to ignore unknown keys
+                val planModel = json.decodeFromString(PlanModel.serializer(), Plans.day0)
+                _screenState.value = LetsBeginWithPlanScreenState(planModel)
             }
         }
     }
