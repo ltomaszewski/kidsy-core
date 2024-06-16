@@ -22,20 +22,32 @@ class CommonGreetingTest {
         assertTrue(stateManager.screenState.value is OnboardingScreenState)
 
         val onboardingScreenState = stateManager.screenState.value as OnboardingScreenState
-        assertTrue (onboardingScreenState.index == 0)
+        assertTrue(onboardingScreenState.index == 0)
 
         stateManager.executeAction(OnboardingScreenState.Action(OnboardingScreenState.ActionType.SUBMIT))
         assertTrue(stateManager.screenState.value is OnboardingScreenState)
 
-        val onboardingScreenStateAfterFirstSubmit = stateManager.screenState.value as OnboardingScreenState
-        assertTrue (onboardingScreenStateAfterFirstSubmit.index == 1)
+        val onboardingScreenStateAfterFirstSubmit =
+            stateManager.screenState.value as OnboardingScreenState
+        assertTrue(onboardingScreenStateAfterFirstSubmit.index == 1)
 
-        stateManager.executeAction(OnboardingScreenState.Action(OnboardingScreenState.ActionType.SELECT, 1))
-        stateManager.executeAction(OnboardingScreenState.Action(OnboardingScreenState.ActionType.SELECT, 2))
+        stateManager.executeAction(
+            OnboardingScreenState.Action(
+                OnboardingScreenState.ActionType.SELECT,
+                1
+            )
+        )
+        stateManager.executeAction(
+            OnboardingScreenState.Action(
+                OnboardingScreenState.ActionType.SELECT,
+                2
+            )
+        )
         assertTrue(stateManager.screenState.value is OnboardingScreenState)
 
-        val onboardingScreenStateAfterMultiSelect = stateManager.screenState.value as OnboardingScreenState
-        assertTrue (onboardingScreenStateAfterMultiSelect.index == 1)
-        assertTrue (onboardingScreenStateAfterMultiSelect.selectedOptions.size == 2)
+        val onboardingScreenStateAfterMultiSelect =
+            stateManager.screenState.value as OnboardingScreenState
+        assertTrue(onboardingScreenStateAfterMultiSelect.index == 1)
+        assertTrue(onboardingScreenStateAfterMultiSelect.selectedOptions.size == 2)
     }
 }

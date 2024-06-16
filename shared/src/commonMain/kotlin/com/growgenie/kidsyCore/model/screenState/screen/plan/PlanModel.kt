@@ -5,10 +5,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PlanModel(
+    val id: String,
     val navigationBarTitle: String? = null,
     val headlineImageName: String = "moon_purpule",
     val headline: String,
     val headlineBottom: String,
     val submit: String,
     val screens: List<ScreenModel>
-    )
+)
