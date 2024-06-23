@@ -1,12 +1,14 @@
-package com.growgenie.kidsyCore.stateHandler
+package com.growgenie.kidsyCore.stateHandler.PlanScreenStateStateHandler
 
 import com.growgenie.kidsyCore.UserSession.UserSession
 import com.growgenie.kidsyCore.UserSession.UserSessionOption
 import com.growgenie.kidsyCore.model.screenState.ScreenState
 import com.growgenie.kidsyCore.model.screenState.screen.plan.PlanScreenState
+import com.growgenie.kidsyCore.stateHandler.StateHandler
 
 class PlanScreenStateStateHandler(val userSession: UserSession) :
     StateHandler<PlanScreenState, PlanScreenState.Action> {
+    private val placeholderReplacer = PlaceholderReplacer()
 
     init {
         println("PlanScreenStateStateHandler initialized")
@@ -17,7 +19,7 @@ class PlanScreenStateStateHandler(val userSession: UserSession) :
         return when (action.type) {
             PlanScreenState.ActionType.SUBMIT -> {
                 println("Executing SUBMIT action: Submitting plan data")
-                val nextScreenState = state.nextScreen()
+                var nextScreenState = state.nextScreen()
                 if (nextScreenState.state != PlanScreenState.State.DONE) {
                     println("Plan not done, moving to next screen state")
                     nextScreenState

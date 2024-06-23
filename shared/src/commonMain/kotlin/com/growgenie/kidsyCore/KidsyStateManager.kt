@@ -1,7 +1,6 @@
 package com.growgenie.kidsyCore
 
 import com.growgenie.kidsyCore.UserSession.UserSession
-import com.growgenie.kidsyCore.UserSession.UserSessionOption
 import com.growgenie.kidsyCore.model.screenState.ScreenState
 import com.growgenie.kidsyCore.model.screenState.UserAction
 import com.growgenie.kidsyCore.model.screenState.screen.CreateAnAccountScreenState
@@ -14,23 +13,27 @@ import com.growgenie.kidsyCore.model.screenState.screen.plan.PlanModel
 import com.growgenie.kidsyCore.model.screenState.screen.plan.PlanScreenState
 import com.growgenie.kidsyCore.model.screenState.screen.plan.Plans
 import com.growgenie.kidsyCore.stateHandler.LetsBeginWithPlanStateHandler
-import com.growgenie.kidsyCore.stateHandler.PlanScreenStateStateHandler
+import com.growgenie.kidsyCore.stateHandler.OnboardingStateHandler
+import com.growgenie.kidsyCore.stateHandler.PlanScreenStateStateHandler.PlanScreenStateStateHandler
+import com.growgenie.kidsyCore.utils.RealmHelper
 import com.growgenie.kidsyCore.utils.wrap
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.json.Json
 
 class KidsyStateManager {
-    private val userSession = UserSession()  // User session instance
+    private val realmHelper = RealmHelper()
+    private val userSession = UserSession(realmHelper)  // User session instance
     private val _screenState = MutableStateFlow<ScreenState>(IntroScreenState())
     val screenState = _screenState.asStateFlow().wrap()
 
+    private val onboardingStateHandler = OnboardingStateHandler(userSession)
     private val letsBeginStateHandler = LetsBeginWithPlanStateHandler(userSession)
     private val planStateHandler = PlanScreenStateStateHandler(userSession)
 
     private fun getInitialScreenState(): ScreenState {
         return if (userSession.hasFinishedOnboarding) {
-            PlanScreenState()  // Or any other initial state after onboarding
+            PlanScreenState(userSession = userSession)  // Or any other initial state after onboarding
         } else {
             IntroScreenState()
         }
@@ -43,7 +46,7 @@ class KidsyStateManager {
                 action as IntroScreenState.Action
             )
 
-            is OnboardingScreenState -> handleOnboardingAction(
+            is OnboardingScreenState -> _screenState.value = onboardingStateHandler.handle(
                 screenState.value,
                 action as OnboardingScreenState.Action
             )
@@ -88,62 +91,6 @@ class KidsyStateManager {
         }
     }
 
-    private fun handleOnboardingAction(
-        screenState: OnboardingScreenState,
-        action: OnboardingScreenState.Action
-    ) {
-        when (action.type) {
-            OnboardingScreenState.ActionType.SUBMIT -> {
-                println("Submitting Onboarding Data...")
-                val nextScreenState = screenState.nextScreen()
-                if (nextScreenState.state != OnboardingScreenState.State.DONE) {
-                    _screenState.value = nextScreenState
-                } else {
-                    _screenState.value = OnboardingSuccessScreenState()
-                }
-            }
-
-            OnboardingScreenState.ActionType.SELECT -> {
-                println("Selecting options...")
-                if (action.option is Int) {
-                    _screenState.value = screenState.updateWithSelectedOption(action.option)
-
-                    println("Update user session SELECT...")
-                    userSession.addOrUpdateOnboardingData(
-                        screenState.currentScreenModel.id,
-                        UserSessionOption().apply {
-                            this.jsonId = screenState.currentScreenModel.id
-                            this.text = action.option.toString()
-                        }
-                    )
-                } else {
-                    throw IllegalArgumentException("Unknown option selected")
-                }
-            }
-
-            OnboardingScreenState.ActionType.TEXT_INPUT -> {
-                println("TEXT_INPUT value...")
-                val localScreenState = _screenState.value
-                if (localScreenState is OnboardingScreenState) {
-                    println("Update user session TEXT_INPUT...")
-                    userSession.addOrUpdateOnboardingData(
-                        localScreenState.currentScreenModel.id,
-                        UserSessionOption().apply {
-                            this.jsonId = localScreenState.currentScreenModel.id
-                            this.text = action.text ?: ""
-                        }
-                    )
-                }
-
-                val nextScreenState = screenState.nextScreen()
-                if (nextScreenState.state != OnboardingScreenState.State.DONE) {
-                    _screenState.value = nextScreenState
-                } else {
-                    _screenState.value = OnboardingSuccessScreenState()
-                }
-            }
-        }
-    }
 
     private fun handleProcessingAction(
         screenState: OnboardingProcessingScreenState,

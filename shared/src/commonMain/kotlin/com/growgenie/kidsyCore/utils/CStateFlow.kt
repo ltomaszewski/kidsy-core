@@ -11,7 +11,8 @@ fun interface Closeable {
     fun close()
 }
 
-class CStateFlow<T: Any> internal constructor(private val origin: StateFlow<T>) : StateFlow<T> by origin {
+class CStateFlow<T : Any> internal constructor(private val origin: StateFlow<T>) :
+    StateFlow<T> by origin {
     fun watch(block: (T) -> Unit): Closeable {
         val job = Job()
 
@@ -23,4 +24,4 @@ class CStateFlow<T: Any> internal constructor(private val origin: StateFlow<T>) 
     }
 }
 
-internal fun <T: Any> StateFlow<T>.wrap(): CStateFlow<T> = CStateFlow(this)
+internal fun <T : Any> StateFlow<T>.wrap(): CStateFlow<T> = CStateFlow(this)

@@ -1,22 +1,12 @@
 package com.growgenie.kidsyCore.UserSession
 
-import io.realm.kotlin.Realm
-import io.realm.kotlin.RealmConfiguration
+import com.growgenie.kidsyCore.utils.RealmHelper
 import io.realm.kotlin.ext.query
 
-class UserSession {
+class UserSession(private val realmHelper: RealmHelper) {
 
-    private val configuration = RealmConfiguration.create(
-        schema = setOf(
-            UserSessionModel::class,
-            OnboardingScreenData::class,
-            PlanData::class,
-            UserSessionOption::class,
-            CollectedOption::class
-        )
-    )
-    private val realm = Realm.open(configuration)
-    private val userSessionModel: UserSessionModel
+    private val realm = realmHelper.realm
+    val userSessionModel: UserSessionModel
     val hasFinishedOnboarding: Boolean
         get() = userSessionModel.userIdentifier.isNotEmpty()
 

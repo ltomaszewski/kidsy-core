@@ -20,7 +20,7 @@ class LetsBeginWithPlanStateHandler(private val userSession: UserSession) :
         return when (action) {
             LetsBeginWithPlanScreenState.Action.BEGIN -> {
                 println("Executing BEGIN action: Initializing plan")
-                val planScreenState = PlanScreenState()
+                val planScreenState = PlanScreenState(userSession = userSession)
                 userSession.addOrUpdatePlan(planScreenState.planModel.id)
                 println("Plan initialized with id: ${planScreenState.planModel.id}")
                 planScreenState

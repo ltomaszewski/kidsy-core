@@ -1,19 +1,24 @@
 package com.growgenie.kidsyCore.model.screenState.screen.plan
 
+import com.growgenie.kidsyCore.UserSession.UserSession
 import com.growgenie.kidsyCore.model.screenState.ScreenName
 import com.growgenie.kidsyCore.model.screenState.ScreenState
 import com.growgenie.kidsyCore.model.screenState.UserAction
 import com.growgenie.kidsyCore.model.screenState.screen.Option
 import com.growgenie.kidsyCore.model.screenState.screen.ScreenModel
-import com.growgenie.kidsyCore.model.screenState.screen.onboarding.OnboardingScreenState
+import com.growgenie.kidsyCore.stateHandler.PlanScreenStateStateHandler.PlaceholderReplacer
 import kotlinx.serialization.json.Json
 
-data class PlanScreenState(val jsonInput: String = Plans.day0,
-                           val state: State = State.START,
-                           val index: Int = 0,
-                           val selectedOptions: List<Option> = listOf()): ScreenState {
+data class PlanScreenState(
+    val jsonInput: String = Plans.day0,
+    val state: State = State.START,
+    val index: Int = 0,
+    val selectedOptions: List<Option> = listOf(),
+    val userSession: UserSession
+) : ScreenState {
 
     override val screenName: ScreenName = ScreenName.PLAN
+
     enum class State { START, PLAN, DONE }
 
     enum class ActionType {
@@ -25,12 +30,16 @@ data class PlanScreenState(val jsonInput: String = Plans.day0,
 
     val planModel: PlanModel
     val currentScreen: ScreenModel
-    val size : Int
+    val size: Int
+    val placeholderReplacer = PlaceholderReplacer()
 
     init {
         val json = Json { ignoreUnknownKeys = true } // Configure the Json to ignore unknown keys
         planModel = json.decodeFromString(PlanModel.serializer(), jsonInput)
-        currentScreen = planModel.screens[index]
+        currentScreen = placeholderReplacer.fillPlaceholders(
+            planModel.screens[index],
+            userSession.userSessionModel
+        )
         size = planModel.screens.size
     }
 
@@ -60,4 +69,5 @@ data class PlanScreenState(val jsonInput: String = Plans.day0,
         } else {
             throw IllegalArgumentException("Option with ID $optionId not found.")
         }
-    } }
+    }
+}
