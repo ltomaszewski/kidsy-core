@@ -71,7 +71,7 @@ class PlanScreenStateStateHandler(
                     nextScreenState
                 } else {
                     println("PlanScreenStateStateHandler Plan is done")
-                    state
+                    HomeTabBarScreenState(sleepTrackerManager = sleepTrackerManager)
                 }
             }
         }

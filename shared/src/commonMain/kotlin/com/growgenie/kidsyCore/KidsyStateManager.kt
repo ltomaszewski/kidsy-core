@@ -31,15 +31,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.json.Json
 
 class KidsyStateManager {
-    // State
-    private val _screenState = MutableStateFlow<ScreenState>(IntroScreenState())
-    val screenState = _screenState.asStateFlow().wrap()
-
     // Services
     private val realmHelper = RealmHelper()
     private val userSession = UserSession(realmHelper)  // User session instance
     private val sleepTrackerManager = SleepTrackerManager(realmHelper)
 
+    // State
+    private val _screenState = MutableStateFlow(getInitialScreenState())
+    val screenState = _screenState.asStateFlow().wrap()
+    
     // StateHandlers
     private val onboardingStateHandler = OnboardingStateHandler(userSession)
     private val letsBeginStateHandler =
