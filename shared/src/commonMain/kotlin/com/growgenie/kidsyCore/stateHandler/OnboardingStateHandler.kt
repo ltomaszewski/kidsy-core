@@ -17,10 +17,10 @@ class OnboardingStateHandler(private val userSession: UserSession) :
         state: OnboardingScreenState,
         action: OnboardingScreenState.Action
     ): ScreenState {
-        println("Handling action: ${action}")
+        println("OnboardingStateHandler Handling action: ${action}")
         return when (action.type) {
             OnboardingScreenState.ActionType.SUBMIT -> {
-                println("Submitting Onboarding Data...")
+                println("OnboardingStateHandler Submitting Onboarding Data...")
                 val nextScreenState = state.nextScreen()
                 if (nextScreenState.state != OnboardingScreenState.State.DONE) {
                     nextScreenState
@@ -30,10 +30,10 @@ class OnboardingStateHandler(private val userSession: UserSession) :
             }
 
             OnboardingScreenState.ActionType.SELECT -> {
-                println("Selecting options...")
+                println("OnboardingStateHandler Selecting options...")
                 if (action.option is Int) {
 
-                    println("Update user session SELECT...")
+                    println("OnboardingStateHandler Update user session SELECT...")
                     userSession.addOrUpdateOnboardingData(
                         state.currentScreenModel.id,
                         UserSessionOption().apply {
@@ -48,8 +48,8 @@ class OnboardingStateHandler(private val userSession: UserSession) :
             }
 
             OnboardingScreenState.ActionType.TEXT_INPUT -> {
-                println("TEXT_INPUT value...")
-                println("Update user session TEXT_INPUT...")
+                println("OnboardingStateHandler TEXT_INPUT value...")
+                println("OnboardingStateHandler Update user session TEXT_INPUT...")
                 userSession.addOrUpdateOnboardingData(
                     state.currentScreenModel.id,
                     UserSessionOption().apply {

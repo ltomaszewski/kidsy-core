@@ -34,7 +34,11 @@ class UserSession(private val realmHelper: RealmHelper) {
         println("Executing saveSession: Saving user session to database")
         println("Current User Session: $userSessionModel")
         realm.writeBlocking {
-//            copyToRealm(userSessionModel)
+            val session = query<UserSessionModel>("id == $0", "session")
+            if (session is UserSessionModel) {
+                delete(session)
+                copyToRealm(userSessionModel)
+            }
         }
     }
 

@@ -3,9 +3,14 @@ package com.growgenie.kidsyCore.stateHandler
 import com.growgenie.kidsyCore.UserSession.UserSession
 import com.growgenie.kidsyCore.model.screenState.ScreenState
 import com.growgenie.kidsyCore.model.screenState.screen.LetsBeginWithPlanScreenState
+import com.growgenie.kidsyCore.model.screenState.screen.home.HomeTabBarScreenState
 import com.growgenie.kidsyCore.model.screenState.screen.plan.PlanScreenState
+import com.growgenie.kidsyCore.sleepTracker.SleepTrackerManager
 
-class LetsBeginWithPlanStateHandler(private val userSession: UserSession) :
+class LetsBeginWithPlanStateHandler(
+    private val userSession: UserSession,
+    private val sleepTrackerManager: SleepTrackerManager
+) :
     StateHandler<LetsBeginWithPlanScreenState, LetsBeginWithPlanScreenState.Action> {
 
     init {
@@ -16,20 +21,20 @@ class LetsBeginWithPlanStateHandler(private val userSession: UserSession) :
         state: LetsBeginWithPlanScreenState,
         action: LetsBeginWithPlanScreenState.Action
     ): ScreenState {
-        println("Handling action: ${action}")
+        println("LetsBeginWithPlanStateHandler Handling action: ${action}")
         return when (action) {
             LetsBeginWithPlanScreenState.Action.BEGIN -> {
-                println("Executing BEGIN action: Initializing plan")
+                println("LetsBeginWithPlanStateHandler Executing BEGIN action: Initializing plan")
                 val planScreenState = PlanScreenState(userSession = userSession)
                 userSession.addOrUpdatePlan(planScreenState.planModel.id)
-                println("Plan initialized with id: ${planScreenState.planModel.id}")
+                println("LetsBeginWithPlanStateHandler Plan initialized with id: ${planScreenState.planModel.id}")
                 planScreenState
             }
 
             LetsBeginWithPlanScreenState.Action.CLOSE -> {
-                println("Executing CLOSE action: Closing Lets Begin screen")
-                println("Close lets begin")
-                state
+                println("LetsBeginWithPlanStateHandler Executing CLOSE action: Closing Lets Begin screen")
+                println("LetsBeginWithPlanStateHandler Close lets begin")
+                HomeTabBarScreenState(sleepTrackerManager = sleepTrackerManager)
             }
         }
     }

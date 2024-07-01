@@ -9,7 +9,7 @@ open class SleepSession : RealmObject {
     var _id: ObjectId = ObjectId()
     var startTime: Long = -1
     var endTime: Long = -1
-    var type: String = SleepSessionType.NAP.toString()
+    var type: String = SleepSessionType.NIGHT.toString()
 }
 
 enum class SleepSessionType {

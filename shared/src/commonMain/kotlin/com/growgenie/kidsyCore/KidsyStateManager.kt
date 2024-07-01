@@ -6,15 +6,24 @@ import com.growgenie.kidsyCore.model.screenState.UserAction
 import com.growgenie.kidsyCore.model.screenState.screen.CreateAnAccountScreenState
 import com.growgenie.kidsyCore.model.screenState.screen.IntroScreenState
 import com.growgenie.kidsyCore.model.screenState.screen.LetsBeginWithPlanScreenState
+import com.growgenie.kidsyCore.model.screenState.screen.home.HomeTabBarScreenState
+import com.growgenie.kidsyCore.model.screenState.screen.home.today.AddSleepSessionScreenState
+import com.growgenie.kidsyCore.model.screenState.screen.home.today.EditSleepSessionScreenState
+import com.growgenie.kidsyCore.model.screenState.screen.home.today.TodayScreenState
 import com.growgenie.kidsyCore.model.screenState.screen.onboarding.OnboardingProcessingScreenState
 import com.growgenie.kidsyCore.model.screenState.screen.onboarding.OnboardingScreenState
 import com.growgenie.kidsyCore.model.screenState.screen.onboarding.OnboardingSuccessScreenState
 import com.growgenie.kidsyCore.model.screenState.screen.plan.PlanModel
 import com.growgenie.kidsyCore.model.screenState.screen.plan.PlanScreenState
 import com.growgenie.kidsyCore.model.screenState.screen.plan.Plans
+import com.growgenie.kidsyCore.sleepTracker.SleepTrackerManager
+import com.growgenie.kidsyCore.stateHandler.HomeTabBarStateHandler
 import com.growgenie.kidsyCore.stateHandler.LetsBeginWithPlanStateHandler
 import com.growgenie.kidsyCore.stateHandler.OnboardingStateHandler
 import com.growgenie.kidsyCore.stateHandler.PlanScreenStateStateHandler.PlanScreenStateStateHandler
+import com.growgenie.kidsyCore.stateHandler.tabs.today.AddSleepSessionStateHandler
+import com.growgenie.kidsyCore.stateHandler.tabs.today.EditSleepSessionStateHandler
+import com.growgenie.kidsyCore.stateHandler.tabs.today.TodayStateHandler
 import com.growgenie.kidsyCore.utils.RealmHelper
 import com.growgenie.kidsyCore.utils.wrap
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,18 +31,28 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.json.Json
 
 class KidsyStateManager {
-    private val realmHelper = RealmHelper()
-    private val userSession = UserSession(realmHelper)  // User session instance
+    // State
     private val _screenState = MutableStateFlow<ScreenState>(IntroScreenState())
     val screenState = _screenState.asStateFlow().wrap()
 
+    // Services
+    private val realmHelper = RealmHelper()
+    private val userSession = UserSession(realmHelper)  // User session instance
+    private val sleepTrackerManager = SleepTrackerManager(realmHelper)
+
+    // StateHandlers
     private val onboardingStateHandler = OnboardingStateHandler(userSession)
-    private val letsBeginStateHandler = LetsBeginWithPlanStateHandler(userSession)
-    private val planStateHandler = PlanScreenStateStateHandler(userSession)
+    private val letsBeginStateHandler =
+        LetsBeginWithPlanStateHandler(userSession, sleepTrackerManager)
+    private val planStateHandler = PlanScreenStateStateHandler(userSession, sleepTrackerManager)
+    private val homeTabBarStateHandler = HomeTabBarStateHandler(userSession)
+    private val todayStateHandler = TodayStateHandler()
+    private val addSleepSessionStateHandler = AddSleepSessionStateHandler(sleepTrackerManager)
+    private val editSleepSessionStateHandler = EditSleepSessionStateHandler(sleepTrackerManager)
 
     private fun getInitialScreenState(): ScreenState {
         return if (userSession.hasFinishedOnboarding) {
-            PlanScreenState(userSession = userSession)  // Or any other initial state after onboarding
+            HomeTabBarScreenState(sleepTrackerManager = sleepTrackerManager)
         } else {
             IntroScreenState()
         }
@@ -46,10 +65,11 @@ class KidsyStateManager {
                 action as IntroScreenState.Action
             )
 
-            is OnboardingScreenState -> _screenState.value = onboardingStateHandler.handle(
-                screenState.value,
-                action as OnboardingScreenState.Action
-            )
+            is OnboardingScreenState -> _screenState.value =
+                onboardingStateHandler.handle(
+                    screenState.value,
+                    action as OnboardingScreenState.Action
+                )
 
             is OnboardingProcessingScreenState -> handleProcessingAction(
                 screenState.value,
@@ -66,13 +86,41 @@ class KidsyStateManager {
                 action as CreateAnAccountScreenState.Action
             )
 
-            is LetsBeginWithPlanScreenState -> _screenState.value = letsBeginStateHandler.handle(
-                screenState.value,
-                action as LetsBeginWithPlanScreenState.Action
-            )
+            is LetsBeginWithPlanScreenState -> _screenState.value =
+                letsBeginStateHandler.handle(
+                    screenState.value,
+                    action as LetsBeginWithPlanScreenState.Action
+                )
 
             is PlanScreenState -> _screenState.value =
-                planStateHandler.handle(screenState.value, action as PlanScreenState.Action)
+                planStateHandler.handle(
+                    screenState.value,
+                    action as PlanScreenState.Action
+                )
+
+            is HomeTabBarScreenState -> _screenState.value =
+                homeTabBarStateHandler.handle(
+                    screenState.value,
+                    action as HomeTabBarScreenState.Action
+                )
+
+            is TodayScreenState -> _screenState.value =
+                todayStateHandler.handle(
+                    screenState.value,
+                    action as TodayScreenState.Action
+                )
+
+            is AddSleepSessionScreenState -> _screenState.value =
+                addSleepSessionStateHandler.handle(
+                    screenState.value,
+                    action as AddSleepSessionScreenState.Action
+                )
+
+            is EditSleepSessionScreenState -> _screenState.value =
+                editSleepSessionStateHandler.handle(
+                    screenState.value,
+                    action as EditSleepSessionScreenState.Action
+                )
 
             else -> throw IllegalArgumentException("Unknown screen type")
         }
@@ -87,6 +135,7 @@ class KidsyStateManager {
 
             IntroScreenState.Action.LOG_IN -> {
                 println("Logging in...")
+                _screenState.value = CreateAnAccountScreenState()
             }
         }
     }

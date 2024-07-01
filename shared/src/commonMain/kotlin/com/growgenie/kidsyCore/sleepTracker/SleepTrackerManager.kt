@@ -4,7 +4,7 @@ import com.growgenie.kidsyCore.utils.DateHelper
 import com.growgenie.kidsyCore.utils.RealmHelper
 import io.realm.kotlin.ext.query
 
-class SleepTrackerManager(private val realmHelper: RealmHelper) {
+class SleepTrackerManager(realmHelper: RealmHelper) {
     private val realm = realmHelper.realm
     private val dateHelper = DateHelper()
 
@@ -53,4 +53,17 @@ class SleepTrackerManager(private val realmHelper: RealmHelper) {
         return realm.query<SleepSession>("id == $0", id).find().first()
     }
 
+    // Delete an existing sleep or nap
+    fun deleteSession(id: String) {
+        realm.writeBlocking {
+            val session = query<SleepSession>("id == $0", id).find().first()
+            delete(session)
+        }
+    }
+
+    // Get today's sleep or nap sessions
+    fun getTodaySessions(): List<SleepSession> {
+        val today = dateHelper.getCurrentUnixTimestamp()
+        return getSessionsForDate(today)
+    }
 }
