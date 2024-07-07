@@ -26,4 +26,9 @@ class RealmHelper {
     fun closeRealm() {
         realm.close()
     }
+
+    fun resetRealm() {
+        realm.close()
+        Realm.deleteRealm(configuration)
+    }
 }

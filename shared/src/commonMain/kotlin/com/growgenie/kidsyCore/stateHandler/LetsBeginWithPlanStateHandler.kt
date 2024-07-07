@@ -34,7 +34,7 @@ class LetsBeginWithPlanStateHandler(
             LetsBeginWithPlanScreenState.Action.CLOSE -> {
                 println("LetsBeginWithPlanStateHandler Executing CLOSE action: Closing Lets Begin screen")
                 println("LetsBeginWithPlanStateHandler Close lets begin")
-                HomeTabBarScreenState(sleepTrackerManager = sleepTrackerManager)
+                HomeTabBarScreenState()
             }
         }
     }

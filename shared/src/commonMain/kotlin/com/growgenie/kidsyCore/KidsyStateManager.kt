@@ -30,29 +30,40 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.json.Json
 
+object DependencyContainer {
+    val realmHelper by lazy { RealmHelper() }
+    val userSession by lazy { UserSession(realmHelper) }
+    val sleepTrackerManager by lazy { SleepTrackerManager(realmHelper) }
+}
+
 class KidsyStateManager {
-    // Services
-    private val realmHelper = RealmHelper()
-    private val userSession = UserSession(realmHelper)  // User session instance
-    private val sleepTrackerManager = SleepTrackerManager(realmHelper)
 
     // State
     private val _screenState = MutableStateFlow(getInitialScreenState())
     val screenState = _screenState.asStateFlow().wrap()
-    
+
     // StateHandlers
-    private val onboardingStateHandler = OnboardingStateHandler(userSession)
+    private val onboardingStateHandler = OnboardingStateHandler(DependencyContainer.userSession)
     private val letsBeginStateHandler =
-        LetsBeginWithPlanStateHandler(userSession, sleepTrackerManager)
-    private val planStateHandler = PlanScreenStateStateHandler(userSession, sleepTrackerManager)
-    private val homeTabBarStateHandler = HomeTabBarStateHandler(userSession)
+        LetsBeginWithPlanStateHandler(
+            DependencyContainer.userSession,
+            DependencyContainer.sleepTrackerManager
+        )
+    private val planStateHandler =
+        PlanScreenStateStateHandler(
+            DependencyContainer.userSession,
+            DependencyContainer.sleepTrackerManager
+        )
+    private val homeTabBarStateHandler = HomeTabBarStateHandler(DependencyContainer.userSession)
     private val todayStateHandler = TodayStateHandler()
-    private val addSleepSessionStateHandler = AddSleepSessionStateHandler(sleepTrackerManager)
-    private val editSleepSessionStateHandler = EditSleepSessionStateHandler(sleepTrackerManager)
+    private val addSleepSessionStateHandler =
+        AddSleepSessionStateHandler(DependencyContainer.sleepTrackerManager)
+    private val editSleepSessionStateHandler =
+        EditSleepSessionStateHandler(DependencyContainer.sleepTrackerManager)
 
     private fun getInitialScreenState(): ScreenState {
-        return if (userSession.hasFinishedOnboarding) {
-            HomeTabBarScreenState(sleepTrackerManager = sleepTrackerManager)
+        return if (DependencyContainer.userSession.hasFinishedOnboarding) {
+            HomeTabBarScreenState()
         } else {
             IntroScreenState()
         }
@@ -187,7 +198,7 @@ class KidsyStateManager {
                 val json =
                     Json { ignoreUnknownKeys = true } // Configure the Json to ignore unknown keys
                 val planModel = json.decodeFromString(PlanModel.serializer(), Plans.day0)
-                userSession.setUserInfo(
+                DependencyContainer.userSession.setUserInfo(
                     action.userIdentifier ?: "-1",
                     action.fullName ?: "-1",
                     action.email ?: "-1"

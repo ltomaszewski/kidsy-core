@@ -12,7 +12,8 @@ class HomeTabBarStateHandler(private val userSession: UserSession) :
     ): ScreenState {
         return when (action.type) {
             HomeTabBarScreenState.ActionType.OPEN_TAB -> {
-                state.copy(state = action.newTabBarState)
+                val newTabState = state.tabBarItems[action.newTabBarIndex].tabState
+                state.copy(state = newTabState)
             }
         }
     }

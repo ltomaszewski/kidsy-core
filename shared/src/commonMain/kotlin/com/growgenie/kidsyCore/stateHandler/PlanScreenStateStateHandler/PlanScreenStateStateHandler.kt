@@ -24,26 +24,39 @@ class PlanScreenStateStateHandler(
         return when (action.type) {
             PlanScreenState.ActionType.SUBMIT -> {
                 println("PlanScreenStateStateHandler Executing SUBMIT action: Submitting plan data")
+                if (action.option is Int) {
+                    userSession.updateCollectedData(
+                        state.planModel.id,
+                        state.currentScreen.id,
+                        UserSessionOption().apply {
+                            this.jsonId = state.currentScreen.id
+                            this.text = action.option.toString()
+                        }
+                    )
+                }
+                
                 var nextScreenState = state.nextScreen()
                 if (nextScreenState.state != PlanScreenState.State.DONE) {
                     println("PlanScreenStateStateHandler Plan not done, moving to next screen state")
                     nextScreenState
                 } else {
                     println("PlanScreenStateStateHandler Plan is done")
-                    HomeTabBarScreenState(sleepTrackerManager = sleepTrackerManager)
+                    HomeTabBarScreenState()
                 }
             }
 
             PlanScreenState.ActionType.SELECT -> {
                 println("PlanScreenStateStateHandler Executing SELECT action: Selecting options")
-                userSession.updateCollectedData(
-                    state.planModel.id,
-                    state.currentScreen.id,
-                    UserSessionOption().apply {
-                        this.jsonId = state.currentScreen.id
-                        this.text = action.option.toString()
-                    }
-                )
+                if (action.option is Int) {
+                    userSession.updateCollectedData(
+                        state.planModel.id,
+                        state.currentScreen.id,
+                        UserSessionOption().apply {
+                            this.jsonId = state.currentScreen.id
+                            this.text = action.option.toString()
+                        }
+                    )
+                }
 
                 if (action.option is Int) {
                     println("PlanScreenStateStateHandler Option is an integer, updating state with selected option")
@@ -71,7 +84,7 @@ class PlanScreenStateStateHandler(
                     nextScreenState
                 } else {
                     println("PlanScreenStateStateHandler Plan is done")
-                    HomeTabBarScreenState(sleepTrackerManager = sleepTrackerManager)
+                    HomeTabBarScreenState()
                 }
             }
         }

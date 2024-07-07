@@ -4,11 +4,9 @@ import com.growgenie.kidsyCore.model.screenState.ScreenName
 import com.growgenie.kidsyCore.model.screenState.ScreenState
 import com.growgenie.kidsyCore.model.screenState.UserAction
 import com.growgenie.kidsyCore.model.screenState.screen.home.today.TodayScreenState
-import com.growgenie.kidsyCore.sleepTracker.SleepTrackerManager
 
 data class HomeTabBarScreenState(
-    val state: State = State.TODAY,
-    val sleepTrackerManager: SleepTrackerManager
+    val state: State = State.TODAY
 ) : ScreenState {
     override val screenName: ScreenName = ScreenName.HOME
 
@@ -20,37 +18,42 @@ data class HomeTabBarScreenState(
         OPEN_TAB
     }
 
-    class Action(val type: ActionType, val newTabBarState: State) : UserAction
+    class Action(val type: ActionType, val newTabBarIndex: Int) : UserAction
 
     data class TabScreenState(
-        val tabState: State,
         val screenState: ScreenState,
         val tabBarItem: TabBarItem
     )
 
     data class TabBarItem(
+        val tabState: State,
         val name: String,
         val imageName: String
     )
 
     val tabBarItems: List<TabBarItem> = listOf(
         TabBarItem(
+            State.TODAY,
             "Today",
             "today_home"
         ),
         TabBarItem(
+            State.PLANS,
             "Plans",
             "plans"
         ),
         TabBarItem(
+            State.SINGLE,
             "Single",
             "single_tab"
         ),
         TabBarItem(
+            State.SCHEDULE,
             "Schedule",
             "schedule_tab"
         ),
         TabBarItem(
+            State.PROFILE,
             "Profile",
             "profile_tab"
         )
@@ -60,45 +63,45 @@ data class HomeTabBarScreenState(
         get() {
             return when (state) {
                 State.TODAY -> TabScreenState(
-                    State.TODAY,
-                    TodayScreenState(sleepTrackerManager = sleepTrackerManager),
+                    TodayScreenState(),
                     TabBarItem(
+                        State.TODAY,
                         "Today",
                         "today_home"
                     )
                 )
 
                 State.PLANS -> TabScreenState(
-                    State.PLANS,
                     PlansTabScreenState(),
                     TabBarItem(
+                        State.PLANS,
                         "Plans",
                         "plans"
                     )
                 )
 
                 State.SINGLE -> TabScreenState(
-                    State.SINGLE,
                     SinglesTabScreenState(),
                     TabBarItem(
+                        State.SINGLE,
                         "Single",
                         "single_tab"
                     )
                 )
 
                 State.SCHEDULE -> TabScreenState(
-                    State.SCHEDULE,
                     ScheduleTabScreenState(),
                     TabBarItem(
+                        State.SCHEDULE,
                         "Schedule",
                         "schedule_tab"
                     )
                 )
 
                 State.PROFILE -> TabScreenState(
-                    State.PROFILE,
                     ProfileTabScreenState(),
                     TabBarItem(
+                        State.PROFILE,
                         "Profile",
                         "profile_tab"
                     )

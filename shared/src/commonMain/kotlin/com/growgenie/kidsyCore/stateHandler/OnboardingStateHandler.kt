@@ -21,6 +21,15 @@ class OnboardingStateHandler(private val userSession: UserSession) :
         return when (action.type) {
             OnboardingScreenState.ActionType.SUBMIT -> {
                 println("OnboardingStateHandler Submitting Onboarding Data...")
+                if (action.option is Int) {
+                    userSession.addOrUpdateOnboardingData(
+                        state.currentScreenModel.id,
+                        UserSessionOption().apply {
+                            this.jsonId = state.currentScreenModel.id
+                            this.text = action.option.toString()
+                        }
+                    )
+                }
                 val nextScreenState = state.nextScreen()
                 if (nextScreenState.state != OnboardingScreenState.State.DONE) {
                     nextScreenState
@@ -32,7 +41,6 @@ class OnboardingStateHandler(private val userSession: UserSession) :
             OnboardingScreenState.ActionType.SELECT -> {
                 println("OnboardingStateHandler Selecting options...")
                 if (action.option is Int) {
-
                     println("OnboardingStateHandler Update user session SELECT...")
                     userSession.addOrUpdateOnboardingData(
                         state.currentScreenModel.id,
